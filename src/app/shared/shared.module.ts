@@ -17,7 +17,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-import { ImageViewerModule } from '@emazv72/ngx-imageviewer';
+import { ImageViewerModule } from '@mxa30/ngx-imageviewer';
 
 @NgModule({
   imports: [

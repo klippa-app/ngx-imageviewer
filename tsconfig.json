@@ -18,7 +18,7 @@
       "dom"
     ],
     "paths": {
-      "@emazv72/ngx-imageviewer": [
+      "@mxa30/ngx-imageviewer": [
         "dist/ngx-imageviewer"
       ]
     }

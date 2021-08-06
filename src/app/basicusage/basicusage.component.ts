@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ViewChild} from '@angular/core';
-import { ImageViewerComponent, ButtonStyle, Point } from '@emazv72/ngx-imageviewer';
+import { ImageViewerComponent, ButtonStyle, Point } from '@mxa30/ngx-imageviewer';
 
 @Component({
   selector: 'app-basicusage',

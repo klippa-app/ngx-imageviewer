@@ -5,9 +5,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/emazv72/ngx-imageviewer"
+    "url": "https://github.com/mxa30/ngx-imageviewer"
   },
-  "homepage": "https://github.com/emazv72/ngx-imageviewer#readme",
+  "homepage": "https://github.com/mxa30/ngx-imageviewer#readme",
   "scripts": {
     "ng": "ng",
     "start": "npm run build:lib && ng serve",
@@ -34,7 +34,7 @@
     "@angular/platform-browser-dynamic": "~11.1.0",
     "@angular/platform-server": "~11.1.0",
     "@angular/router": "~11.1.0",
-    "@emazv72/ngx-imageviewer": "^2.3.0",
+    "@mxa30/ngx-imageviewer": "^2.3.0",
     "hammerjs": "^2.0.8",
     "pdfjs-dist": "~2.5.207",
     "rxjs": "~6.6.3",

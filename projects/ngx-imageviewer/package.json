@@ -1,11 +1,11 @@
 {
-  "name": "@emazv72/ngx-imageviewer",
-  "version": "0.0.0-development",
-  "author": "Hallyson Almeida <hallysonh@gmail.com>",
+  "name": "@mxa30/ngx-imageviewer",
+  "version": "1.0.0",
+  "author": "Max van der Velde",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/emazv72/ngx-imageviewer"
+    "url": "https://github.com/mxa30/ngx-imageviewer"
   },
   "keywords": [
     "image",
@@ -15,7 +15,7 @@
     "canvas",
     "component"
   ],
-  "homepage": "https://github.com/emazv72/ngx-imageviewer#readme",
+  "homepage": "https://github.com/mxa30/ngx-imageviewer#readme",
   "peerDependencies": {
     "@angular/common": "~11.1.0",
     "@angular/core": "~11.1.0"
