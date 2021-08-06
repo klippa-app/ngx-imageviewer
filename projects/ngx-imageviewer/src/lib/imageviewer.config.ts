@@ -43,8 +43,32 @@ export interface ButtonConfig {
   show?: boolean;
 }
 
+export interface Point {
+  x: number;
+  y: number;
+}
+
 export function createButtonConfig(icon?: string, tooltip?: string, sortId: number = 0, show: boolean = true) {
   return { icon: icon, tooltip: tooltip, sortId: sortId, show: show };
+}
+
+export function createButtonStyle(
+  iconFontFamily?: string,
+  alpha?: number,
+  hoverAlpha?: number,
+  bgStyle?: string,
+  iconStyle?: string,
+  borderStyle?: string,
+  borderWidth?: number) {
+  return {
+    iconFontFamily: iconFontFamily,
+    alpha: alpha,
+    hoverAlpha: hoverAlpha,
+    bgStyle: bgStyle,
+    iconStyle: iconStyle,
+    borderStyle: borderStyle,
+    borderWidth: borderWidth,
+  };
 }
 
 export const IMAGEVIEWER_CONFIG = new InjectionToken<ImageViewerConfig>('imageviewer.config');

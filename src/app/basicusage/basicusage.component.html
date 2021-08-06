@@ -4,10 +4,11 @@
     <mat-icon>clear</mat-icon>
     <mat-form-field fxFlex="100px"><input name="canvasHeight" matInput placeholder="Height" [(ngModel)]="canvasHeight"></mat-form-field>
     <mat-form-field fxFlex><input name="imageSrc" matInput placeholder="Resource URL" [(ngModel)]="imageSrc"></mat-form-field>
+    <mat-slide-toggle  [(ngModel)]="showDrawings" (ngModelChange)="toggleDrawings($event)" [ngModelOptions]="{standalone: true}">{{ showDrawings ? 'Drawings Visible' : 'Drawings Hidden'}}</mat-slide-toggle>
   </div>
   <mat-button-toggle-group #group="matButtonToggleGroup" [value]="imageSrc" (change)="imageSrc = $event.value">
     <mat-button-toggle *ngFor="let sample of samples; let i = index" color="accent" [value]="sample.url">{{ sample.label }}</mat-button-toggle>
   </mat-button-toggle-group>
 </form>
 
-<ngx-imageviewer [src]="imageSrc" [width]="canvasWidth" [height]="canvasHeight"></ngx-imageviewer>
+<ngx-imageviewer #imageViewerComponent [src]="imageSrc" [width]="canvasWidth" [height]="canvasHeight"></ngx-imageviewer>

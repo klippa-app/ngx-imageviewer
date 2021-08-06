@@ -1,12 +1,21 @@
-import { Component, Input, ViewChild, AfterViewInit, Renderer2, Inject, OnDestroy } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { Subscription } from 'rxjs';
+import {AfterViewInit, Component, Inject, Input, OnDestroy, Renderer2, ViewChild} from '@angular/core';
+import {DomSanitizer} from '@angular/platform-browser';
+import {Subscription} from 'rxjs';
 
-import { ImageViewerConfig, IMAGEVIEWER_CONFIG, IMAGEVIEWER_CONFIG_DEFAULT, ButtonConfig, ButtonStyle } from './imageviewer.config';
-import { Viewport, Button, toSquareAngle, ResourceLoader } from './imageviewer.model';
-import { ImageResourceLoader } from './image.loader';
-import { ImageCacheService } from './imagecache.service';
-import { PdfResourceLoader } from './pdf.loader';
+import {
+  ButtonConfig,
+  ButtonStyle,
+  createButtonConfig,
+  createButtonStyle,
+  IMAGEVIEWER_CONFIG,
+  IMAGEVIEWER_CONFIG_DEFAULT,
+  ImageViewerConfig,
+  Point
+} from './imageviewer.config';
+import {Button, ResourceLoader, toSquareAngle, UserDefinedButton} from './imageviewer.model';
+import {ImageResourceLoader} from './image.loader';
+import {ImageCacheService} from './imagecache.service';
+import {PdfResourceLoader} from './pdf.loader';
 
 const MIN_TOOLTIP_WIDTH_SPACE = 500;
 
@@ -85,6 +94,12 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
 
   // contains all active buttons
   private _buttons = [];
+
+  // contains all user defined draw callbacks
+  private _drawCallbacks: Array<(ctx: CanvasRenderingContext2D) => void> = [];
+
+  // contains all user defined buttons
+  private _userDefinedButtons: Array<UserDefinedButton> = [];
 
   // current tool tip (used to track change of tool tip)
   private _currentTooltip = null;
@@ -231,6 +246,43 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
     }
     this._dirty = true;
   }
+
+  //#region custom drawing
+
+  drawOnFile(drawCallback: (ctx: CanvasRenderingContext2D) => void) {
+    this._drawCallbacks.push(drawCallback);
+    this.updateCanvas();
+  }
+
+  drawButtonOnFile(
+    polygon: Array<Point>,
+    radius: number,
+    buttonConfig: ButtonConfig,
+    buttonStyle: ButtonStyle,
+    onClick: (evt) => boolean
+  ) {
+    buttonConfig = buttonConfig !== null && buttonConfig !== undefined ? buttonConfig : createButtonConfig();
+    buttonStyle = buttonStyle !== null && buttonStyle !== undefined ? buttonStyle : createButtonStyle();
+
+    const button: Button = new Button(buttonConfig, buttonStyle);
+    button.onClick = (evt) => {
+      return onClick(evt);
+    };
+
+    const userButton: UserDefinedButton = {
+      polygon: polygon,
+      radius: radius,
+      button: button,
+    };
+    this._userDefinedButtons.push(userButton);
+    this.updateCanvas();
+  }
+
+  eraseAll() {
+    this._drawCallbacks = [];
+    this._userDefinedButtons = [];
+    this.updateCanvas();
+  }
   //#endregion
 
   //#region Mouse Events
@@ -343,7 +395,7 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
       const ctx = this._context;
       ctx.save();
 
-      this._resource.draw(ctx, this.config, this._canvas, () => {
+      this._resource.draw(ctx, this.config, this._canvas, this._drawCallbacks, this._userDefinedButtons, () => {
         ctx.restore();
 
         if (vm._resource.loaded) {
@@ -369,7 +421,7 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
 
     // draw buttons
     for (let i = 0; i < this._buttons.length; i++) {
-      this._buttons[i].draw(ctx, x, y - gap * i, radius);
+      this._buttons[i].drawAsCircle(ctx, x, y - gap * i, radius);
     }
 
     // draw tooltip
@@ -413,8 +465,8 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
     const fontSize = 25;
 
     ctx.save();
-    this._beforePageButton.draw(ctx, x1, y, radius);
-    this._nextPageButton.draw(ctx, x3, y, radius);
+    this._beforePageButton.drawAsCircle(ctx, x1, y, radius);
+    this._nextPageButton.drawAsCircle(ctx, x3, y, radius);
     ctx.restore();
 
     ctx.save();
@@ -475,12 +527,15 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
     const hoverElements = this._buttons.slice();
     hoverElements.push(this._nextPageButton);
     hoverElements.push(this._beforePageButton);
+    this._userDefinedButtons.forEach((button) => {
+      hoverElements.push(button.button);
+    });
     return hoverElements;
   }
 
   private getUIElement(pos: { x: number, y: number }) {
     const activeUIElement = this.getUIElements().filter((uiElement) => {
-      return uiElement.isWithinBounds(pos.x, pos.y);
+      return uiElement.isWithinBounds(this._context, pos.x, pos.y);
     });
     return (activeUIElement.length > 0) ? activeUIElement[0] : null;
   }

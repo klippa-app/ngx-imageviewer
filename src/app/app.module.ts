@@ -12,6 +12,8 @@ import { AutoResizeComponent } from './autoresize/autoresize.component';
 import { UploadPreviewComponent } from './uploadpreview/uploadpreview.component';
 import { ConditionalDisplayComponent } from './conditionaldisplay/conditionaldisplay.component';
 
+import { HammerModule } from '@angular/platform-browser';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -25,7 +27,8 @@ import { ConditionalDisplayComponent } from './conditionaldisplay/conditionaldis
     BrowserModule.withServerTransition({ appId: 'serverApp' }),
     AppRoutingModule,
     BrowserAnimationsModule,
-    SharedModule
+    SharedModule,
+    HammerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

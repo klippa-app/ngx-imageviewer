@@ -1,10 +1,13 @@
-import { Component } from '@angular/core';
+import {AfterViewInit, Component, ViewChild} from '@angular/core';
+import { ImageViewerComponent, ButtonStyle, Point } from '@emazv72/ngx-imageviewer';
 
 @Component({
   selector: 'app-basicusage',
   templateUrl: './basicusage.component.html'
 })
-export class BasicUsageComponent {
+export class BasicUsageComponent implements AfterViewInit {
+
+  @ViewChild('imageViewerComponent') imageViewerComponent: ImageViewerComponent;
   samples = [
     { label: 'PDF Test', url: 'https://emazv72.github.io/ngx-imageviewer/pdf-test.pdf' },
     { label: 'Image 1 (BIG)', url: 'https://emazv72.github.io/ngx-imageviewer/assets/imgs/sample-0.jpg' },
@@ -18,6 +21,51 @@ export class BasicUsageComponent {
   canvasWidth = 800;
   canvasHeight = 600;
   imageSrc = this.samples[0].url;
+  showDrawings = true;
 
-  constructor() { }
+  constructor() {}
+
+  ngAfterViewInit() {
+    this.setupButton();
+    this.setupRect();
+  }
+
+  toggleDrawings(showDrawings) {
+    if (showDrawings) {
+      this.setupButton();
+      this.setupRect();
+    } else {
+      this.imageViewerComponent.eraseAll();
+    }
+  }
+
+  setupButton() {
+    const buttonStyle: ButtonStyle = {
+      alpha: 0.4,
+      hoverAlpha: 0.4,
+      bgStyle: '#5aed58',
+      borderStyle: '#5aed58',
+      borderWidth: 3,
+    };
+    const polygon: Array<Point> = [
+      {x: 100, y: 100},
+      {x: 200, y: 200},
+      {x: 80, y: 200}
+    ];
+
+    const callback = (evt) => {
+      console.log('Button pressed!');
+      return false;
+    };
+    this.imageViewerComponent.drawButtonOnFile(polygon, 100, null, buttonStyle, callback);
+  }
+
+  setupRect() {
+    this.imageViewerComponent.drawOnFile((ctx: CanvasRenderingContext2D) => {
+      ctx.save();
+      ctx.fillStyle = '#FF0000';
+      ctx.fillRect(500, 500, 100, 100);
+      ctx.restore();
+    });
+  }
 }
