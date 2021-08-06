@@ -256,7 +256,6 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
 
   drawButtonOnFile(
     polygon: Array<Point>,
-    radius: number,
     buttonConfig: ButtonConfig,
     buttonStyle: ButtonStyle,
     onClick: (evt) => boolean
@@ -271,7 +270,6 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
 
     const userButton: UserDefinedButton = {
       polygon: polygon,
-      radius: radius,
       button: button,
     };
     this._userDefinedButtons.push(userButton);

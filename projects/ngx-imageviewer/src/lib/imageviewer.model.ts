@@ -3,7 +3,6 @@ import {Subject} from 'rxjs';
 
 export interface UserDefinedButton {
   polygon: Array<Point>;
-  radius: number;
   button: Button;
 }
 
