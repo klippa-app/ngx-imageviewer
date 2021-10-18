@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Inject, Input, OnDestroy, Renderer2, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, Inject, Input, OnDestroy, Output, Renderer2, ViewChild} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
 import {Subscription} from 'rxjs';
 
@@ -24,7 +24,7 @@ const MIN_TOOLTIP_WIDTH_SPACE = 500;
   template: `
     <canvas #imageContainer [width]="width" [height]="height"
       (click)="onTap($event)" (pinchin)="processTouchEvent($event)" (pinchout)="processTouchEvent($event)"
-      (panmove)="processTouchEvent($event)" (panend)="onTouchEnd()" (rotatemove)="processTouchEvent($event)"
+      (pan)="processTouchEvent($event)" (panend)="onTouchEnd()" (rotatemove)="processTouchEvent($event)"
       (rotateend)="onTouchEnd()">
     </canvas>
   `,
@@ -91,6 +91,15 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
   private _rotateLeftButton: Button;
   private _rotateRightButton: Button;
   private _resetButton: Button;
+  private _selectModeButton: Button;
+
+  // select mode state
+  private selectMode = false;
+
+  // select box
+  private selectBoxPosition: {x: number, y: number, width: number, height: number};
+  private selectBoxStartPosition: {x: number, y: number};
+  @Output() selected: EventEmitter<Array<Point>> = new EventEmitter<Array<Point>>();
 
   // contains all active buttons
   private _buttons = [];
@@ -135,12 +144,14 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
     this._rotateLeftButton = new Button(this.config.rotateLeftButton, this.config.buttonStyle);
     this._rotateRightButton = new Button(this.config.rotateRightButton, this.config.buttonStyle);
     this._resetButton = new Button(this.config.resetButton, this.config.buttonStyle);
+    this._selectModeButton = new Button(this.config.selectModeButton, this.config.buttonStyle);
     this._buttons = [
       this._zoomOutButton,
       this._zoomInButton,
       this._rotateLeftButton,
       this._rotateRightButton,
-      this._resetButton
+      this._resetButton,
+      this._selectModeButton
     ].filter(item => item.display)
       .sort((a, b) => a.sortId - b.sortId);
   }
@@ -161,6 +172,7 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
     this._rotateLeftButton.onClick = (evt) => { this.rotateLeft(); return false; };
     this._rotateRightButton.onClick = (evt) => { this.rotateRight(); return false; };
     this._resetButton.onClick = (evt) => { this.resetImage(); return false; };
+    this._selectModeButton.onClick = (evt) => { this.toggleSelectMode(); return false; };
 
     // register event listeners
     this.addEventListeners();
@@ -222,15 +234,24 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
     this._touchStartState.viewport = undefined;
     this._touchStartState.scale = undefined;
     this._touchStartState.rotate = undefined;
+    if (this.selectMode) {
+      this.removeSelectBox();
+    }
   }
 
   processTouchEvent(evt) {
-    // process pan
-    if (!this._touchStartState.viewport) { this._touchStartState.viewport = Object.assign({}, this._resource.viewport); }
-
     const viewport = this._resource.viewport;
-    viewport.x = this._touchStartState.viewport.x + evt.deltaX;
-    viewport.y = this._touchStartState.viewport.y + evt.deltaY;
+
+    if (!this._touchStartState.viewport) {
+      this._touchStartState.viewport = Object.assign({}, this._resource.viewport);
+    }
+    if (this.selectMode) {
+      this.createSelectBox(evt);
+    } else {
+      // process pan
+      viewport.x = this._touchStartState.viewport.x + evt.deltaX;
+      viewport.y = this._touchStartState.viewport.y + evt.deltaY;
+    }
 
     // process pinch in/out
     if (!this._touchStartState.scale) { this._touchStartState.scale = this._resource.viewport.scale; }
@@ -248,6 +269,44 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
   }
 
   //#region custom drawing
+
+  private createSelectBox(evt) {
+    if (typeof this.selectBoxStartPosition === 'undefined' || this.selectBoxStartPosition === null) {
+      this.selectBoxStartPosition = this.screenToCanvasCentre({x: evt.srcEvent.clientX, y: evt.srcEvent.clientY});
+    }
+    const currentMousePos = this.screenToCanvasCentre({x: evt.srcEvent.clientX, y: evt.srcEvent.clientY});
+    const selectBoxWidth = currentMousePos.x - this.selectBoxStartPosition.x;
+    const selectBoxHeight = currentMousePos.y - this.selectBoxStartPosition.y;
+
+    this.selectBoxPosition = {
+      x: this.selectBoxStartPosition.x,
+      y: this.selectBoxStartPosition.y,
+      width: selectBoxWidth,
+      height: selectBoxHeight
+    };
+  }
+
+  private getSelectBoxAsPolygon(): Array<Point> {
+    const selectBox = this.selectBoxPosition;
+    const selectBoxAsPolygon: Array<Point> = [
+      {x: selectBox.x, y: selectBox.y},
+      {x: selectBox.x, y: selectBox.y + selectBox.height},
+      {x: selectBox.x + selectBox.width, y: selectBox.y + selectBox.height},
+      {x: selectBox.x + selectBox.width, y: selectBox.y},
+    ];
+    return selectBoxAsPolygon;
+  }
+
+  private removeSelectBox() {
+    // Emit event with polygon of select box.
+    this.selected.emit(this._resource.getPolygonAsPositionOnImage(this.getSelectBoxAsPolygon()));
+
+    // Clear the select box.
+    this.selectBoxPosition = null;
+    this.selectBoxStartPosition = null;
+    this._dirty = true;
+    this.render();
+  }
 
   drawOnFile(drawCallback: (ctx: CanvasRenderingContext2D) => void) {
     this._drawCallbacks.push(drawCallback);
@@ -374,6 +433,10 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
     this._resource.resetViewport(this._canvas);
     this._dirty = true;
   }
+
+  private toggleSelectMode() {
+    this.selectMode = !this.selectMode;
+  }
   //#endregion
 
   //#region Draw Canvas
@@ -399,6 +462,11 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
         if (vm._resource.loaded) {
           // draw buttons
           this.drawButtons(ctx);
+
+          // draw selectBox
+          if (this.selectMode) {
+            this.drawSelectBox(ctx);
+          }
 
           // draw paginator
           if (this._resource.showItemsQuantity) {
@@ -449,6 +517,21 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
 
       ctx.restore();
     }
+  }
+
+  private drawSelectBox(ctx) {
+    const pos = this.selectBoxPosition;
+    if (this.selectBoxPosition === null || typeof this.selectBoxPosition === 'undefined') {
+      return;
+    }
+    ctx.save();
+
+    ctx.strokeStyle = '34eb7d';
+    ctx.beginPath();
+    ctx.setLineDash([5]);
+    ctx.strokeRect(pos.x, pos.y, pos.width, pos.height);
+    ctx.stroke();
+    ctx.restore();
   }
 
   private drawPaginator(ctx) {
@@ -513,6 +596,7 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
     if (cfg.rotateLeftButton) { localCfg.rotateLeftButton = Object.assign(defaultCfg.rotateLeftButton, cfg.rotateLeftButton); }
     if (cfg.rotateRightButton) { localCfg.rotateRightButton = Object.assign(defaultCfg.rotateRightButton, cfg.rotateRightButton); }
     if (cfg.resetButton) { localCfg.resetButton = Object.assign(defaultCfg.resetButton, cfg.resetButton); }
+    if (cfg.selectModeButton) { localCfg.selectModeButton = Object.assign(defaultCfg.selectModeButton, cfg.selectModeButton); }
     return localCfg;
   }
 

@@ -11,4 +11,4 @@
   </mat-button-toggle-group>
 </form>
 
-<ngx-imageviewer #imageViewerComponent [src]="imageSrc" [width]="canvasWidth" [height]="canvasHeight"></ngx-imageviewer>
+<ngx-imageviewer #imageViewerComponent [src]="imageSrc" [width]="canvasWidth" [height]="canvasHeight" (selected)="logSelectBox($event)"></ngx-imageviewer>

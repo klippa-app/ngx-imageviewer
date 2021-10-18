@@ -144,46 +144,6 @@ export class Button {
 
     return false;
   }
-
-  accountForViewPort(polygon: Array<Point>, viewport: Viewport, image): Array<Point> {
-    const accountedForZoom: Array<Point> = this.accountForZoom(polygon, viewport, image);
-
-    // rotate around center of canvas
-    const rotationPoint: Point = {
-      x: viewport.x + viewport.width / 2,
-      y: viewport.y + viewport.height / 2
-    };
-    const accountedForRotation: Array<Point> = this.accountForRotation(accountedForZoom, viewport.rotation, rotationPoint);
-
-    return accountedForRotation;
-  }
-
-  private accountForZoom(polygon: Array<Point>, viewport: Viewport, image): Array<Point> {
-    return polygon.map((point, i) => {
-      const x = point.x * viewport.scale;
-      const y = point.y * viewport.scale;
-
-      const xMove = (viewport.x + viewport.width / 2) - (image.width / 2 * viewport.scale);
-      const yMove = (viewport.y + viewport.height / 2) - (image.height / 2 * viewport.scale);
-
-      return {
-        x: x + xMove,
-        y: y + yMove
-      };
-    });
-  }
-
-  private accountForRotation(polygon: Array<Point>, rotation: number, rotationPoint: Point): Array<Point> {
-    const angle = rotation * Math.PI / 180;
-    return polygon.map((point) => {
-      const xRotated = rotationPoint.x + Math.cos(angle) * (point.x - rotationPoint.x) - Math.sin(angle) * (point.y - rotationPoint.y);
-      const yRotated = rotationPoint.y + Math.sin(angle) * (point.x - rotationPoint.x) + Math.cos(angle) * (point.y - rotationPoint.y);
-      return {
-        x: xRotated,
-        y: yRotated
-      };
-    });
-  }
   //#endregion
 }
 
@@ -222,6 +182,7 @@ export abstract class ResourceLoader {
   public resetViewport(canvasDim: Dimension): boolean {
     if (!this.loaded || !canvasDim) { return; }
 
+    this.viewport.rotation = 0;
     const rotation = this.viewport ? this.viewport.rotation : 0;
     const inverted = toSquareAngle(rotation) / 90 % 2 !== 0;
     const canvas = {
@@ -280,7 +241,7 @@ export abstract class ResourceLoader {
         userDefinedButtons.forEach((btnObject) => {
           btnObject.button.drawAsPolygon(
             ctx,
-            btnObject.button.accountForViewPort(btnObject.polygon, this.viewport, this._image)
+            this.accountForViewPort(btnObject.polygon)
           );
         });
       }
@@ -294,6 +255,75 @@ export abstract class ResourceLoader {
   }
 
   public onResourceChange() { return this.resourceChange.asObservable(); }
+
+  accountForViewPort(polygon: Array<Point>): Array<Point> {
+    const accountedForZoom: Array<Point> = this.accountForZoom(polygon);
+
+    const accountedForRotationAndZoom: Array<Point> = this.accountForRotation(accountedForZoom);
+
+    return accountedForRotationAndZoom;
+  }
+
+  private accountForZoom(polygon: Array<Point>): Array<Point> {
+    return polygon.map((point, i) => {
+      const x = point.x * this.viewport.scale;
+      const y = point.y * this.viewport.scale;
+
+      const xMove = (this.viewport.x + this.viewport.width / 2) - (this._image.width / 2 * this.viewport.scale);
+      const yMove = (this.viewport.y + this.viewport.height / 2) - (this._image.height / 2 * this.viewport.scale);
+
+      return {
+        x: x + xMove,
+        y: y + yMove
+      };
+    });
+  }
+
+  private accountForRotation(polygon: Array<Point>): Array<Point> {
+    const angle = this.viewport.rotation * Math.PI / 180;
+    return this.rotatePolygon(polygon, angle);
+  }
+
+  getPolygonAsPositionOnImage(polygon: Array<Point>) {
+    const polygonRotatedBackToOrigin: Array<Point> = this.getPolygonRotatedBackToOrigin(polygon);
+
+    const polygonRotatedBackToOriginAndNoZoom: Array<Point> = this.getPolygonWithNoZoom(polygonRotatedBackToOrigin);
+
+    return polygonRotatedBackToOriginAndNoZoom;
+  }
+
+  private getPolygonWithNoZoom(polygon: Array<Point>): Array<Point> {
+    return polygon.map((point, i) => {
+      const xMove = (this.viewport.x + this.viewport.width / 2) - (this._image.width / 2 * this.viewport.scale);
+      const yMove = (this.viewport.y + this.viewport.height / 2) - (this._image.height / 2 * this.viewport.scale);
+
+      return {
+        x: (point.x - xMove) / this.viewport.scale,
+        y: (point.y - yMove) / this.viewport.scale
+      };
+    });
+  }
+
+  private getPolygonRotatedBackToOrigin(polygon: Array<Point>): Array<Point> {
+    const angle = -this.viewport.rotation * Math.PI / 180;
+    return this.rotatePolygon(polygon, angle);
+  }
+
+  rotatePolygon(polygon: Array<Point>, angle: number): Array<Point> {
+    // rotate around center of canvas
+    const rotationPoint: Point = {
+      x: this.viewport.x + this.viewport.width / 2,
+      y: this.viewport.y + this.viewport.height / 2
+    };
+    return polygon.map((point) => {
+      const xRotated = rotationPoint.x + Math.cos(angle) * (point.x - rotationPoint.x) - Math.sin(angle) * (point.y - rotationPoint.y);
+      const yRotated = rotationPoint.y + Math.sin(angle) * (point.x - rotationPoint.x) + Math.cos(angle) * (point.y - rotationPoint.y);
+      return {
+        x: xRotated,
+        y: yRotated
+      };
+    });
+  }
 }
 
 export function toSquareAngle(angle: number) {

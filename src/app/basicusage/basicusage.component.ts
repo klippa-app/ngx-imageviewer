@@ -57,7 +57,7 @@ export class BasicUsageComponent implements AfterViewInit {
       console.log('Button pressed!');
       return false;
     };
-    this.imageViewerComponent.drawButtonOnFile(polygon, 100, null, buttonStyle, callback);
+    this.imageViewerComponent.drawButtonOnFile(polygon, null, buttonStyle, callback);
   }
 
   setupRect() {
@@ -67,5 +67,9 @@ export class BasicUsageComponent implements AfterViewInit {
       ctx.fillRect(500, 500, 100, 100);
       ctx.restore();
     });
+  }
+
+  logSelectBox(event) {
+    console.log('selected position on image', event);
   }
 }

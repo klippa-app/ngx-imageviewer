@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser';
+import {BrowserModule, HAMMER_GESTURE_CONFIG, HammerGestureConfig} from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 
@@ -13,6 +13,11 @@ import { UploadPreviewComponent } from './uploadpreview/uploadpreview.component'
 import { ConditionalDisplayComponent } from './conditionaldisplay/conditionaldisplay.component';
 
 import { HammerModule } from '@angular/platform-browser';
+
+export class HammerConfig extends HammerGestureConfig {
+  // This configuration makes the (pan) event trigger after 1px of movement instead of 10px. It makes the UX more responsive.
+  overrides = {pan: {threshold: 1}};
+}
 
 @NgModule({
   declarations: [
@@ -30,7 +35,7 @@ import { HammerModule } from '@angular/platform-browser';
     SharedModule,
     HammerModule
   ],
-  providers: [],
+  providers: [{provide: HAMMER_GESTURE_CONFIG, useClass: HammerConfig}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

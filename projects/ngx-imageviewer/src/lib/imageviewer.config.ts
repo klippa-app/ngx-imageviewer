@@ -24,6 +24,7 @@ export class ImageViewerConfig {
   rotateLeftButton?: ButtonConfig;
   rotateRightButton?: ButtonConfig;
   resetButton?: ButtonConfig;
+  selectModeButton?: ButtonConfig;
 }
 
 export interface ButtonStyle {
@@ -104,5 +105,6 @@ export let IMAGEVIEWER_CONFIG_DEFAULT: ImageViewerConfig = {
   zoomInButton: createButtonConfig(String.fromCharCode(0xE8FF), 'Zoom in', 1),
   rotateLeftButton: createButtonConfig(String.fromCharCode(0xE419), 'Rotate left', 2),
   rotateRightButton: createButtonConfig(String.fromCharCode(0xE41A), 'Rotate right', 3),
-  resetButton: createButtonConfig(String.fromCharCode(0xE863), 'Reset', 4)
+  resetButton: createButtonConfig(String.fromCharCode(0xE863), 'Reset', 4),
+  selectModeButton: createButtonConfig(String.fromCharCode(0xEF52), 'Select mode toggle', 5)
 };
