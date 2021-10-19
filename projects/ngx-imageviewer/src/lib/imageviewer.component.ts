@@ -110,6 +110,9 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
   // contains all user defined buttons
   private _userDefinedButtons: Array<UserDefinedButton> = [];
 
+  // current active element (used to track change of active element)
+  private _currentActiveElement = null;
+
   // current tool tip (used to track change of tool tip)
   private _currentTooltip = null;
 
@@ -349,9 +352,10 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
     this._listenDestroyList.push(this._renderer.listen(this._canvas, 'mousewheel', (evt) => this.onMouseWheel(evt)));
 
     // show tooltip when mouseover it
-    this._listenDestroyList.push(this._renderer.listen(this._canvas, 'mousemove', (evt) =>
-      this.checkTooltipActivation(this.screenToCanvasCentre({ x: evt.clientX, y: evt.clientY }))
-    ));
+    this._listenDestroyList.push(this._renderer.listen(this._canvas, 'mousemove', (evt) => {
+        this.checkTooltipActivation(this.screenToCanvasCentre({x: evt.clientX, y: evt.clientY}));
+      })
+    );
   }
 
   private onMouseWheel(evt) {
@@ -367,7 +371,6 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
   private checkTooltipActivation(pos: { x: number, y: number }) {
     this.getUIElements().forEach(x => x.hover = false);
     const activeElement = this.getUIElement(pos);
-    const oldToolTip = this._currentTooltip;
     if (activeElement !== null) {
       if (typeof activeElement.hover !== 'undefined') {
         activeElement.hover = true;
@@ -375,8 +378,13 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
       if (typeof activeElement.tooltip !== 'undefined') {
         this._currentTooltip = activeElement.tooltip;
       }
+    } else {
+      this._currentTooltip = null;
     }
-    if (oldToolTip !== this._currentTooltip) { this._dirty = true; }
+
+    const oldActiveElement = this._currentActiveElement;
+    this._currentActiveElement = activeElement;
+    if (oldActiveElement !== this._currentActiveElement) { this._dirty = true; }
   }
   //#endregion
 

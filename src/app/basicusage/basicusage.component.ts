@@ -42,7 +42,7 @@ export class BasicUsageComponent implements AfterViewInit {
   setupButton() {
     const buttonStyle: ButtonStyle = {
       alpha: 0.4,
-      hoverAlpha: 0.4,
+      hoverAlpha: 0.8,
       bgStyle: '#5aed58',
       borderStyle: '#5aed58',
       borderWidth: 3,
