@@ -12,7 +12,7 @@ import {
   ImageViewerConfig,
   Point
 } from './imageviewer.config';
-import {Button, ResourceLoader, toSquareAngle, UserDefinedButton} from './imageviewer.model';
+import {Button, PageInfo, ResourceLoader, toSquareAngle, UserDefinedButton} from './imageviewer.model';
 import {ImageResourceLoader} from './image.loader';
 import {ImageCacheService} from './imagecache.service';
 import {PdfResourceLoader} from './pdf.loader';
@@ -125,6 +125,7 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
   // image / Pdf Drawable Resource
   private _resource: ResourceLoader;
   private _resourceChangeSub: Subscription;
+  public onResourceChanged: EventEmitter<any> = new EventEmitter<any>();
 
   // Caching resourceLoader instances to reuse
   private _imageResource: ImageResourceLoader;
@@ -214,6 +215,7 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
     if (this._resource) {
       this._resource.src = this.src instanceof File ? URL.createObjectURL(this.src) : this.src;
       this._resourceChangeSub = this._resource.onResourceChange().subscribe(() => {
+        this.onResourceChanged.next();
         this.updateCanvas();
         if (this.src instanceof File) {
           URL.revokeObjectURL(this._resource.src);
@@ -309,6 +311,10 @@ export class ImageViewerComponent implements AfterViewInit, OnDestroy {
     this.selectBoxStartPosition = null;
     this._dirty = true;
     this.render();
+  }
+
+  getCurrentPageInfo(): PageInfo {
+    return this._resource?.getCurrentPageInfo();
   }
 
   drawOnFile(drawCallback: (ctx: CanvasRenderingContext2D) => void) {

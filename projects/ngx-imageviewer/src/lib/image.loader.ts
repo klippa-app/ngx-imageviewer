@@ -1,5 +1,4 @@
-import { ResourceLoader, Dimension, toSquareAngle } from './imageviewer.model';
-import { ImageViewerConfig } from './imageviewer.config';
+import {PageInfo, ResourceLoader} from './imageviewer.model';
 
 export class ImageResourceLoader extends ResourceLoader {
 
@@ -16,5 +15,9 @@ export class ImageResourceLoader extends ResourceLoader {
       this.resourceChange.next();
     }, false);
     this._image.src = this.src;
+  }
+
+  getCurrentPageInfo(): PageInfo {
+    return {width: this._image.width, height: this._image.height, pageNumber: 1};
   }
 }

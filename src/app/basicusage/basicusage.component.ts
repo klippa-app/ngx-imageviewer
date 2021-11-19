@@ -26,8 +26,11 @@ export class BasicUsageComponent implements AfterViewInit {
   constructor() {}
 
   ngAfterViewInit() {
-    this.setupButton();
-    this.setupRect();
+    this.imageViewerComponent.onResourceChanged.subscribe(() => {
+      this.imageViewerComponent.eraseAll();
+      this.setupButton();
+      this.setupRect();
+    });
   }
 
   toggleDrawings(showDrawings) {
@@ -47,10 +50,24 @@ export class BasicUsageComponent implements AfterViewInit {
       borderStyle: '#5aed58',
       borderWidth: 3,
     };
+    const scaleFactor = 1652 / this.imageViewerComponent.getCurrentPageInfo().width;
     const polygon: Array<Point> = [
-      {x: 100, y: 100},
-      {x: 200, y: 200},
-      {x: 80, y: 200}
+      {
+        'x': 123 / scaleFactor,
+        'y': 279 / scaleFactor
+      },
+      {
+        'x': 206 / scaleFactor,
+        'y': 279 / scaleFactor
+      },
+      {
+        'x': 206 / scaleFactor,
+        'y': 313 / scaleFactor
+      },
+      {
+        'x': 123 / scaleFactor,
+        'y': 313 / scaleFactor
+      }
     ];
 
     const callback = (evt) => {

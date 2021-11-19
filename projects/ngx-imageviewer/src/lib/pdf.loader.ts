@@ -1,8 +1,10 @@
-import { ResourceLoader, Dimension, toSquareAngle } from './imageviewer.model';
-import { ImageCacheService } from './imagecache.service';
-import { PDFDocumentProxy, PDFPageProxy, getDocument } from 'pdfjs-dist';
+import {PageInfo, ResourceLoader} from './imageviewer.model';
+import {ImageCacheService} from './imagecache.service';
+import {getDocument, PDFDocumentProxy, PDFPageProxy} from 'pdfjs-dist';
 
 export class PdfResourceLoader extends ResourceLoader {
+  private _pageWidth: number;
+  private _pageHeight: number;
   private _pdf: PDFDocumentProxy;
   private _page: PDFPageProxy;
   private _pendingReload: boolean;
@@ -67,6 +69,8 @@ export class PdfResourceLoader extends ResourceLoader {
     const pageVp = vm._page.getViewport({ scale: 2 });
     canvas.width = pageVp.width;
     canvas.height = pageVp.height;
+    vm._pageWidth = pageVp.width;
+    vm._pageHeight = pageVp.height;
 
     const renderContext = {
       canvasContext: context,
@@ -82,5 +86,10 @@ export class PdfResourceLoader extends ResourceLoader {
         vm._image = img;
       });
     });
+  }
+
+  getCurrentPageInfo(): PageInfo {
+    const vm = this;
+    return {width: vm._pageWidth, height: vm._pageHeight, pageNumber: vm._page.pageNumber};
   }
 }

@@ -160,6 +160,8 @@ export class Viewport {
 
 export interface Dimension { width: number; height: number; }
 
+export interface PageInfo { width: number; height: number; pageNumber: number; }
+
 export abstract class ResourceLoader {
   public src: string;
   public sourceDim: { width: number, height: number };
@@ -178,6 +180,7 @@ export abstract class ResourceLoader {
 
   abstract setUp();
   abstract loadResource();
+  abstract getCurrentPageInfo(): PageInfo;
 
   public resetViewport(canvasDim: Dimension): boolean {
     if (!this.loaded || !canvasDim) { return; }
