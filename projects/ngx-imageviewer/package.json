@@ -1,6 +1,6 @@
 {
   "name": "@mxa30/ngx-imageviewer",
-  "version": "3.0.0",
+  "version": "4.0.2",
   "author": "Max van der Velde",
   "license": "MIT",
   "repository": {
@@ -21,6 +21,6 @@
     "@angular/core": "~11.1.0"
   },
   "optionalDependencies": {
-    "pdfjs-dist": "~2.5.207"
+    "pdfjs-dist": "^2.10.377"
   }
 }
