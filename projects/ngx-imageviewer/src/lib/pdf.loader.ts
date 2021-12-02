@@ -57,12 +57,6 @@ export class PdfResourceLoader extends ResourceLoader {
 
   private loadImage(src: string, page: number, onFinish: () => void) {
     const vm = this;
-    const cacheimg = vm._imageCache.getImage(src, page);
-    if (cacheimg) {
-      vm._image = cacheimg;
-      onFinish();
-      return;
-    }
 
     const canvas: HTMLCanvasElement = document.createElement('canvas');
     const context = canvas.getContext('2d');
@@ -71,6 +65,13 @@ export class PdfResourceLoader extends ResourceLoader {
     canvas.height = pageVp.height;
     vm._pageWidth = pageVp.width;
     vm._pageHeight = pageVp.height;
+
+    const cacheimg = vm._imageCache.getImage(src, page);
+    if (cacheimg) {
+      vm._image = cacheimg;
+      onFinish();
+      return;
+    }
 
     const renderContext = {
       canvasContext: context,

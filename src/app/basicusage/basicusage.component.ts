@@ -9,7 +9,7 @@ export class BasicUsageComponent implements AfterViewInit {
 
   @ViewChild('imageViewerComponent') imageViewerComponent: ImageViewerComponent;
   samples = [
-    { label: 'PDF Test', url: 'https://emazv72.github.io/ngx-imageviewer/pdf-test.pdf' },
+    { label: 'PDF Test', url: 'http://localhost:4200/assets/pdf-test1.pdf' },
     { label: 'Image 1 (BIG)', url: 'https://emazv72.github.io/ngx-imageviewer/assets/imgs/sample-0.jpg' },
     { label: 'Image 2', url: 'https://emazv72.github.io/ngx-imageviewer/assets/imgs/sample-1.jpg' },
     { label: 'Image 3', url: 'https://emazv72.github.io/ngx-imageviewer/assets/imgs/sample-2.jpg' },
@@ -50,6 +50,7 @@ export class BasicUsageComponent implements AfterViewInit {
       borderStyle: '#5aed58',
       borderWidth: 3,
     };
+    console.log(this.imageViewerComponent.getCurrentPageInfo());
     const scaleFactor = 1652 / this.imageViewerComponent.getCurrentPageInfo().width;
     const polygon: Array<Point> = [
       {
