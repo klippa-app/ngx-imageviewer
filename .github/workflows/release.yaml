@@ -16,7 +16,7 @@ jobs:
           node-version: 14.x
           always-auth: true
       - run: npm install
-      - run: npm build
+      - run: npm run build
       - run: npm publish ./dist/ngx-imageviewer
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

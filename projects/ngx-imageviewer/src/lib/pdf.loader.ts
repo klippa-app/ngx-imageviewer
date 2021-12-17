@@ -1,6 +1,7 @@
 import {PageInfo, ResourceLoader} from './imageviewer.model';
 import {ImageCacheService} from './imagecache.service';
-import {getDocument, PDFDocumentProxy, PDFPageProxy} from 'pdfjs-dist';
+import {getDocument} from 'pdfjs-dist';
+import {PDFDocumentProxy, PDFPageProxy} from 'pdfjs-dist/types/src/display/api';
 
 export class PdfResourceLoader extends ResourceLoader {
   private _pageWidth: number;
