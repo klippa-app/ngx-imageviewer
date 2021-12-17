@@ -19,7 +19,7 @@ This project generate a image/pdf viewer using canvas.
 
 ## Demo
 
-Access a demo by downloading [this](https://github.com/mxa30/ngx-imageviewer) project and execute: `yarn && yarn start` or `npm install && npm run start` to self server it.
+Access a demo by downloading [this](https://github.com/klippa-app/ngx-imageviewer) project and execute: `yarn && yarn start` or `npm install && npm run start` to self server it.
 
 ## Icon Font
 
@@ -38,7 +38,7 @@ Optionaly, you can also install the font library via npm or yarn.
 After import the module `ImageViewerModule`:
 
 ```typescript
-import { ImageViewerModule } from '@mxa30/ngx-imageviewer';
+import { ImageViewerModule } from '@klippa/ngx-imageviewer';
 
 @NgModule({
   imports: [ImageViewerModule],
@@ -77,7 +77,7 @@ To add PDF rendering support, you must first include `pdfjs` by running `yarn ad
 Optionaly, you can provide a custom configuration like below:
 
 ```typescript
-import { IMAGEVIEWER_CONFIG, ImageViewerConfig } from '@mxa30/ngx-imageviewer';
+import { IMAGEVIEWER_CONFIG, ImageViewerConfig } from '@klippa/ngx-imageviewer';
 ...
 const MY_IMAGEVIEWER_CONFIG: ImageViewerConfig = {
   buttonStyle: {

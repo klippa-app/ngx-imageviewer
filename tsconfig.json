@@ -18,7 +18,7 @@
       "dom"
     ],
     "paths": {
-      "@mxa30/ngx-imageviewer": [
+      "@klippa/ngx-imageviewer": [
         "dist/ngx-imageviewer"
       ]
     }

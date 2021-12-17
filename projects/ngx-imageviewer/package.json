@@ -1,11 +1,11 @@
 {
-  "name": "@mxa30/ngx-imageviewer",
-  "version": "4.0.4",
-  "author": "Max van der Velde",
+  "name": "@klippa/ngx-imageviewer",
+  "version": "1.0.0",
+  "author": "Klippa",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mxa30/ngx-imageviewer"
+    "url": "https://github.com/klippa-app/ngx-imageviewer"
   },
   "keywords": [
     "image",
@@ -15,7 +15,7 @@
     "canvas",
     "component"
   ],
-  "homepage": "https://github.com/mxa30/ngx-imageviewer#readme",
+  "homepage": "https://github.com/klippa-app/ngx-imageviewer#readme",
   "peerDependencies": {
     "@angular/common": "~11.1.0",
     "@angular/core": "~11.1.0"
