@@ -3,9 +3,7 @@ name: NPM Publish
 on:
   push:
     tags:
-      - '*'
-    branches:
-      - master
+      - 'v*.*.*'
 
 jobs:
   publish:
